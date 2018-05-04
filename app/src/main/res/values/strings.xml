@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">QRreader</string>
+  <string name="qr_code_here">QR Code Here</string>
+  <string name="clear_text">Clear text</string>
 </resources>
