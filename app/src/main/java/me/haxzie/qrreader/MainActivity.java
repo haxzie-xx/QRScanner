@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.MaterialDialog.Builder;
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView;
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView.OnQRCodeReadListener;
 import retrofit2.Call;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements
   private FloatingActionButton fab;
   private ImageButton clearTextButton;
 
+  private MaterialDialog progressDialog;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -36,6 +40,12 @@ public class MainActivity extends AppCompatActivity implements
     qrCodeEditText = findViewById(R.id.qr_code);
     fab = findViewById(R.id.fab);
     clearTextButton = findViewById(R.id.btn_clear_text);
+
+    /* Build Progress Dialog */
+    MaterialDialog.Builder builder = new Builder(this)
+        .title("Verifying...")
+        .progress(true, 0);
+    progressDialog = builder.build();
 
     clearTextButton.setOnClickListener(this);
     fab.setOnClickListener(this);
@@ -74,7 +84,10 @@ public class MainActivity extends AppCompatActivity implements
       if (code.length() < 6) {
         Toast.makeText(this, "Invalid Code!", Toast.LENGTH_SHORT).show();
       } else {
-        register(code);
+        // TODO: use this method after JSON model change
+        // register(code);
+
+        VerificationHandler.verifyCode(MainActivity.this, code, progressDialog);
       }
     }
   }
@@ -87,31 +100,6 @@ public class MainActivity extends AppCompatActivity implements
     }
   }
 
-  public void register(String code) {
-    qrCodeReaderView.stopCamera();
-
-    Call<VerificationResponse> call = RemoteApi.createService(QRCodeVerificationService.class)
-        .verifyCode(code);
-    call.enqueue(new Callback<VerificationResponse>() {
-      @Override
-      public void onResponse(Call<VerificationResponse> call,
-          Response<VerificationResponse> response) {
-
-        Log.d(TAG, "onResponse: " + response.body().toString());
-
-        qrCodeReaderView.startCamera();
-      }
-
-      @Override
-      public void onFailure(Call<VerificationResponse> call, Throwable t) {
-        Log.e(TAG, "onFailure: " + t.getLocalizedMessage(), t);
-
-        qrCodeReaderView.startCamera();
-      }
-    });
-
-
-  }
 
   @Override
   public void onBackPressed() {
