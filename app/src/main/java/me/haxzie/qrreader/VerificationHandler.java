@@ -33,14 +33,14 @@ public class VerificationHandler {
             .title("Verification Status")
             .contentGravity(GravityEnum.CENTER);
 
-        if (response.body().contains("already registered")) {
+        if (response.body().toLowerCase().contains("registered")) {
           status
-              .content("Verified Registration!")
+              .content(response.body())
               .contentColor(ContextCompat.getColor(context, R.color.verified))
               .show();
-        } else {
+        } else if (response.body().toLowerCase().contains("invalid")) {
           status
-              .content("Invalid User!")
+              .content(response.body())
               .contentColor(ContextCompat.getColor(context, R.color.error))
               .show();
         }
@@ -62,7 +62,6 @@ public class VerificationHandler {
 
 
   public static void register(String code) {
-
 
     Call<VerificationResponse> call = RemoteApiServiceCreator
         .createService(QRCodeVerificationService.class)
